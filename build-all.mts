@@ -14,15 +14,24 @@ const PER_ENTRY_CSS_GLOB = "**/*.{css,pcss,scss,sass}";
 const PER_ENTRY_CSS_IGNORE = "**/*.module.*".split(",").map((s) => s.trim());
 const GLOBAL_CSS_LIST = [path.resolve("src/index.css")];
 
-const targets: string[] = [
-  "todo",
-  "solar-system",
-  "pizzaz",
-  "pizzaz-carousel",
-  "pizzaz-list",
-  "pizzaz-albums",
-  "pizzaz-video",
+const DEFAULT_TARGETS = [
+  "portfolio-overview",
+  "holdings-detail",
+  "news-feed",
 ];
+
+const envTargets = process.env.BUILD_TARGETS;
+const targets: string[] = envTargets
+  ? envTargets
+      .split(",")
+      .map((target) => target.trim())
+      .filter(Boolean)
+      .flatMap((target) =>
+        target === "*" || target.toLowerCase() === "all"
+          ? entries.map((file) => path.basename(path.dirname(file)))
+          : [target]
+      )
+  : DEFAULT_TARGETS;
 const builtNames: string[] = [];
 
 function wrapEntryPlugin(
